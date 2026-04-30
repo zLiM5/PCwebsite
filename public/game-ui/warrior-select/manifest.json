@@ -1,0 +1,887 @@
+{
+  "version": 1,
+  "name": "warrior-select-godot-ui",
+  "source": "/game-ui/warrior-select/source/reference.png",
+  "source_size": {
+    "width": 1672,
+    "height": 941
+  },
+  "target_engine": "Godot 4.x",
+  "text_policy": "All character names, labels, stats, button captions, list values, and descriptions are dynamic text. Do not bake gameplay text into image assets.",
+  "coordinate_space": "Original screenshot pixels, top-left origin",
+  "node_tree": [
+    "Control/WarriorSelectScreen",
+    "BackgroundLayer",
+    "LeftListPanel",
+    "CenterProfilePanel",
+    "RightAttributePanel",
+    "BottomActionBar"
+  ],
+  "assets": [
+    {
+      "id": "background.bottom-smoke-crop",
+      "path": "/game-ui/warrior-select/layers/background/bottom-smoke-crop.png",
+      "kind": "png-crop",
+      "layer": "background",
+      "usage": "底部烟雾和前景暗部裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 936,
+        "height": 130
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 394,
+        "top": 770,
+        "width": 936,
+        "height": 130
+      }
+    },
+    {
+      "id": "background.hero-character-crop",
+      "path": "/game-ui/warrior-select/layers/background/hero-character-crop.png",
+      "kind": "png-crop",
+      "layer": "background",
+      "usage": "右侧人物与旗帜裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 650,
+        "height": 804
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 716,
+        "top": 58,
+        "width": 650,
+        "height": 804
+      }
+    },
+    {
+      "id": "background.ink-paper-crop",
+      "path": "/game-ui/warrior-select/layers/background/ink-paper-crop.png",
+      "kind": "png-crop",
+      "layer": "background",
+      "usage": "水墨纸底与远山烟雾裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 945,
+        "height": 824
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 388,
+        "top": 57,
+        "width": 945,
+        "height": 824
+      }
+    },
+    {
+      "id": "button.brush-primary",
+      "path": "/game-ui/warrior-select/components/buttons/brush-primary.svg",
+      "kind": "svg",
+      "layer": "bottom-actions",
+      "usage": "开始游戏笔刷按钮底和金色装饰，不含文字",
+      "godot_node": "TextureButton",
+      "size": {
+        "width": 492,
+        "height": 82
+      },
+      "dynamic_text": true,
+      "nine_patch_margin": {
+        "left": 70,
+        "top": 24,
+        "right": 70,
+        "bottom": 24
+      },
+      "states": [
+        "normal",
+        "hover",
+        "pressed",
+        "disabled"
+      ]
+    },
+    {
+      "id": "button.detail",
+      "path": "/game-ui/warrior-select/components/buttons/detail-button.svg",
+      "kind": "svg",
+      "layer": "profile",
+      "usage": "查看详情按钮底图，不含文字",
+      "godot_node": "StyleBoxTexture",
+      "size": {
+        "width": 84,
+        "height": 31
+      },
+      "dynamic_text": true,
+      "nine_patch_margin": {
+        "left": 6,
+        "top": 6,
+        "right": 6,
+        "bottom": 6
+      },
+      "states": [
+        "normal",
+        "hover"
+      ]
+    },
+    {
+      "id": "button.return",
+      "path": "/game-ui/warrior-select/components/buttons/return-button.svg",
+      "kind": "svg",
+      "layer": "bottom-actions",
+      "usage": "返回按钮底图，不含文字",
+      "godot_node": "StyleBoxTexture",
+      "size": {
+        "width": 82,
+        "height": 36
+      },
+      "dynamic_text": true,
+      "nine_patch_margin": {
+        "left": 6,
+        "top": 6,
+        "right": 6,
+        "bottom": 6
+      },
+      "states": [
+        "normal",
+        "hover",
+        "pressed"
+      ]
+    },
+    {
+      "id": "button.tag",
+      "path": "/game-ui/warrior-select/components/buttons/tag-button.svg",
+      "kind": "svg",
+      "layer": "profile",
+      "usage": "身份标签按钮底图，不含文字",
+      "godot_node": "StyleBoxTexture",
+      "size": {
+        "width": 56,
+        "height": 28
+      },
+      "dynamic_text": true,
+      "nine_patch_margin": {
+        "left": 5,
+        "top": 5,
+        "right": 5,
+        "bottom": 5
+      },
+      "states": [
+        "normal",
+        "hover"
+      ]
+    },
+    {
+      "id": "dropdown.background",
+      "path": "/game-ui/warrior-select/components/dropdown/ink-dropdown-bg.svg",
+      "kind": "svg",
+      "layer": "left-list",
+      "usage": "筛选下拉框底图，不含文字",
+      "godot_node": "StyleBoxTexture",
+      "size": {
+        "width": 160,
+        "height": 32
+      },
+      "dynamic_text": true,
+      "nine_patch_margin": {
+        "left": 6,
+        "top": 6,
+        "right": 24,
+        "bottom": 6
+      },
+      "states": [
+        "normal",
+        "hover",
+        "disabled"
+      ]
+    },
+    {
+      "id": "dropdown.caret",
+      "path": "/game-ui/warrior-select/components/dropdown/caret.svg",
+      "kind": "svg",
+      "layer": "left-list",
+      "usage": "下拉箭头",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 18,
+        "height": 18
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.faction-wei",
+      "path": "/game-ui/warrior-select/components/icons/faction-wei.svg",
+      "kind": "svg",
+      "layer": "profile",
+      "usage": "魏阵营徽章",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 36,
+        "height": 36
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.help",
+      "path": "/game-ui/warrior-select/components/icons/help.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "帮助问号图标",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 18,
+        "height": 18
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.skill-frame",
+      "path": "/game-ui/warrior-select/components/icons/skill-frame.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "初始技能圆形图标框",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 64,
+        "height": 64
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.stat.attack",
+      "path": "/game-ui/warrior-select/components/icons/stat-attack.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "武力属性图标",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 24,
+        "height": 24
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.stat.charm",
+      "path": "/game-ui/warrior-select/components/icons/stat-charm.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "魅力属性图标",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 24,
+        "height": 24
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.stat.intellect",
+      "path": "/game-ui/warrior-select/components/icons/stat-intellect.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "智力属性图标",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 24,
+        "height": 24
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.stat.leadership",
+      "path": "/game-ui/warrior-select/components/icons/stat-leadership.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "统率属性图标",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 24,
+        "height": 24
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.stat.politics",
+      "path": "/game-ui/warrior-select/components/icons/stat-politics.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "政治属性图标",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 24,
+        "height": 24
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.trait-frame",
+      "path": "/game-ui/warrior-select/components/icons/trait-frame.svg",
+      "kind": "svg",
+      "layer": "profile",
+      "usage": "武将特性圆形图标框和占位纹理",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 54,
+        "height": 54
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.unit.archer",
+      "path": "/game-ui/warrior-select/components/icons/unit-archer.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "弓兵适性图标",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 24,
+        "height": 24
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.unit.cavalry",
+      "path": "/game-ui/warrior-select/components/icons/unit-cavalry.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "骑兵适性图标",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 24,
+        "height": 24
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.unit.infantry",
+      "path": "/game-ui/warrior-select/components/icons/unit-infantry.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "步兵适性图标",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 24,
+        "height": 24
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.unit.siege",
+      "path": "/game-ui/warrior-select/components/icons/unit-siege.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "攻城适性图标",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 24,
+        "height": 24
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "icon.unit.spear",
+      "path": "/game-ui/warrior-select/components/icons/unit-spear.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "枪兵适性图标",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 24,
+        "height": 24
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "list.avatar-frame",
+      "path": "/game-ui/warrior-select/components/list/avatar-mask-frame.svg",
+      "kind": "svg",
+      "layer": "left-list",
+      "usage": "头像遮罩和细描边",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 76,
+        "height": 62
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "list.row-normal",
+      "path": "/game-ui/warrior-select/components/list/general-row-normal.svg",
+      "kind": "svg",
+      "layer": "left-list",
+      "usage": "列表项普通态底图，不含文字",
+      "godot_node": "StyleBoxTexture",
+      "size": {
+        "width": 342,
+        "height": 70
+      },
+      "dynamic_text": true,
+      "nine_patch_margin": {
+        "left": 8,
+        "top": 8,
+        "right": 8,
+        "bottom": 8
+      },
+      "states": [
+        "normal"
+      ]
+    },
+    {
+      "id": "list.row-selected",
+      "path": "/game-ui/warrior-select/components/list/general-row-selected.svg",
+      "kind": "svg",
+      "layer": "left-list",
+      "usage": "列表项选中态底图、金色描边和阵营氛围",
+      "godot_node": "StyleBoxTexture",
+      "size": {
+        "width": 342,
+        "height": 70
+      },
+      "dynamic_text": true,
+      "nine_patch_margin": {
+        "left": 8,
+        "top": 8,
+        "right": 8,
+        "bottom": 8
+      },
+      "states": [
+        "selected",
+        "hover"
+      ]
+    },
+    {
+      "id": "list.scrollbar-thumb",
+      "path": "/game-ui/warrior-select/components/list/scrollbar-thumb.svg",
+      "kind": "svg",
+      "layer": "left-list",
+      "usage": "滚动条滑块",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 6,
+        "height": 84
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "list.scrollbar-track",
+      "path": "/game-ui/warrior-select/components/list/scrollbar-track.svg",
+      "kind": "svg",
+      "layer": "left-list",
+      "usage": "滚动条轨道",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 6,
+        "height": 782
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "list.sort-badge",
+      "path": "/game-ui/warrior-select/components/list/general-sort-badge.svg",
+      "kind": "svg",
+      "layer": "left-list",
+      "usage": "列表项右上排序徽标底图，不含文字",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 51,
+        "height": 30
+      },
+      "dynamic_text": true,
+      "states": [
+        "selected"
+      ]
+    },
+    {
+      "id": "ornament.title-left",
+      "path": "/game-ui/warrior-select/components/icons/title-ornament-left.svg",
+      "kind": "svg",
+      "layer": "top-title",
+      "usage": "顶部标题左侧金色装饰线",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 74,
+        "height": 14
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "ornament.title-right",
+      "path": "/game-ui/warrior-select/components/icons/title-ornament-right.svg",
+      "kind": "svg",
+      "layer": "top-title",
+      "usage": "顶部标题右侧金色装饰线",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 74,
+        "height": 14
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "panel.left-list",
+      "path": "/game-ui/warrior-select/components/panels/left-list-panel.svg",
+      "kind": "svg",
+      "layer": "left-list",
+      "usage": "左侧武将列表容器底与描边",
+      "godot_node": "NinePatchRect",
+      "size": {
+        "width": 354,
+        "height": 792
+      },
+      "dynamic_text": true,
+      "nine_patch_margin": {
+        "left": 8,
+        "top": 8,
+        "right": 8,
+        "bottom": 8
+      }
+    },
+    {
+      "id": "panel.profile-paper",
+      "path": "/game-ui/warrior-select/components/panels/profile-paper-panel.svg",
+      "kind": "svg",
+      "layer": "profile",
+      "usage": "中央武将资料区水墨纸面参考底",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 470,
+        "height": 412
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "panel.right-attributes",
+      "path": "/game-ui/warrior-select/components/panels/right-attribute-panel.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "右侧属性面板暗底、分割线与边缘纹理",
+      "godot_node": "NinePatchRect",
+      "size": {
+        "width": 342,
+        "height": 548
+      },
+      "dynamic_text": true,
+      "nine_patch_margin": {
+        "left": 10,
+        "top": 10,
+        "right": 10,
+        "bottom": 10
+      }
+    },
+    {
+      "id": "portrait.01",
+      "path": "/game-ui/warrior-select/layers/portraits/portrait-01.png",
+      "kind": "png-crop",
+      "layer": "left-list",
+      "usage": "武将列表头像裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 72,
+        "height": 58
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 31,
+        "top": 101,
+        "width": 72,
+        "height": 58
+      }
+    },
+    {
+      "id": "portrait.02",
+      "path": "/game-ui/warrior-select/layers/portraits/portrait-02.png",
+      "kind": "png-crop",
+      "layer": "left-list",
+      "usage": "武将列表头像裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 72,
+        "height": 58
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 31,
+        "top": 176,
+        "width": 72,
+        "height": 58
+      }
+    },
+    {
+      "id": "portrait.03",
+      "path": "/game-ui/warrior-select/layers/portraits/portrait-03.png",
+      "kind": "png-crop",
+      "layer": "left-list",
+      "usage": "武将列表头像裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 72,
+        "height": 58
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 31,
+        "top": 250,
+        "width": 72,
+        "height": 58
+      }
+    },
+    {
+      "id": "portrait.04",
+      "path": "/game-ui/warrior-select/layers/portraits/portrait-04.png",
+      "kind": "png-crop",
+      "layer": "left-list",
+      "usage": "武将列表头像裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 72,
+        "height": 58
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 31,
+        "top": 323,
+        "width": 72,
+        "height": 58
+      }
+    },
+    {
+      "id": "portrait.05",
+      "path": "/game-ui/warrior-select/layers/portraits/portrait-05.png",
+      "kind": "png-crop",
+      "layer": "left-list",
+      "usage": "武将列表头像裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 72,
+        "height": 58
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 31,
+        "top": 398,
+        "width": 72,
+        "height": 58
+      }
+    },
+    {
+      "id": "portrait.06",
+      "path": "/game-ui/warrior-select/layers/portraits/portrait-06.png",
+      "kind": "png-crop",
+      "layer": "left-list",
+      "usage": "武将列表头像裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 72,
+        "height": 58
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 31,
+        "top": 472,
+        "width": 72,
+        "height": 58
+      }
+    },
+    {
+      "id": "portrait.07",
+      "path": "/game-ui/warrior-select/layers/portraits/portrait-07.png",
+      "kind": "png-crop",
+      "layer": "left-list",
+      "usage": "武将列表头像裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 72,
+        "height": 58
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 31,
+        "top": 545,
+        "width": 72,
+        "height": 58
+      }
+    },
+    {
+      "id": "portrait.08",
+      "path": "/game-ui/warrior-select/layers/portraits/portrait-08.png",
+      "kind": "png-crop",
+      "layer": "left-list",
+      "usage": "武将列表头像裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 72,
+        "height": 58
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 31,
+        "top": 619,
+        "width": 72,
+        "height": 58
+      }
+    },
+    {
+      "id": "portrait.09",
+      "path": "/game-ui/warrior-select/layers/portraits/portrait-09.png",
+      "kind": "png-crop",
+      "layer": "left-list",
+      "usage": "武将列表头像裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 72,
+        "height": 58
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 31,
+        "top": 692,
+        "width": 72,
+        "height": 58
+      }
+    },
+    {
+      "id": "portrait.10",
+      "path": "/game-ui/warrior-select/layers/portraits/portrait-10.png",
+      "kind": "png-crop",
+      "layer": "left-list",
+      "usage": "武将列表头像裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 72,
+        "height": 58
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 31,
+        "top": 766,
+        "width": 72,
+        "height": 58
+      }
+    },
+    {
+      "id": "portrait.11",
+      "path": "/game-ui/warrior-select/layers/portraits/portrait-11.png",
+      "kind": "png-crop",
+      "layer": "left-list",
+      "usage": "武将列表头像裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 72,
+        "height": 58
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 31,
+        "top": 839,
+        "width": 72,
+        "height": 58
+      }
+    },
+    {
+      "id": "skill.01",
+      "path": "/game-ui/warrior-select/layers/skills/skill-01.png",
+      "kind": "png-crop",
+      "layer": "attributes",
+      "usage": "初始技能图标裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 63,
+        "height": 63
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 1357,
+        "top": 681,
+        "width": 63,
+        "height": 63
+      }
+    },
+    {
+      "id": "skill.02",
+      "path": "/game-ui/warrior-select/layers/skills/skill-02.png",
+      "kind": "png-crop",
+      "layer": "attributes",
+      "usage": "初始技能图标裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 63,
+        "height": 63
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 1436,
+        "top": 681,
+        "width": 63,
+        "height": 63
+      }
+    },
+    {
+      "id": "skill.03",
+      "path": "/game-ui/warrior-select/layers/skills/skill-03.png",
+      "kind": "png-crop",
+      "layer": "attributes",
+      "usage": "初始技能图标裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 63,
+        "height": 63
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 1516,
+        "top": 681,
+        "width": 63,
+        "height": 63
+      }
+    },
+    {
+      "id": "skill.04",
+      "path": "/game-ui/warrior-select/layers/skills/skill-04.png",
+      "kind": "png-crop",
+      "layer": "attributes",
+      "usage": "初始技能图标裁切参考",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 63,
+        "height": 63
+      },
+      "dynamic_text": false,
+      "source_rect": {
+        "left": 1594,
+        "top": 681,
+        "width": 63,
+        "height": 63
+      }
+    },
+    {
+      "id": "stat.fill",
+      "path": "/game-ui/warrior-select/components/stat-bars/stat-fill.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "属性进度条填充，可按宽度缩放",
+      "godot_node": "TextureRect",
+      "size": {
+        "width": 168,
+        "height": 8
+      },
+      "dynamic_text": true
+    },
+    {
+      "id": "stat.track",
+      "path": "/game-ui/warrior-select/components/stat-bars/stat-track.svg",
+      "kind": "svg",
+      "layer": "attributes",
+      "usage": "属性进度条底",
+      "godot_node": "StyleBoxTexture",
+      "size": {
+        "width": 168,
+        "height": 8
+      },
+      "dynamic_text": true,
+      "nine_patch_margin": {
+        "left": 2,
+        "top": 2,
+        "right": 2,
+        "bottom": 2
+      }
+    }
+  ]
+}

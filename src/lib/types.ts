@@ -1,3 +1,5 @@
+export type EntityType = "space" | "note" | "document";
+
 export type Space = {
   id: string;
   user_id?: string;
@@ -31,6 +33,8 @@ export type Todo = {
   id: string;
   user_id?: string;
   space_id: string;
+  entity_type: EntityType;
+  entity_id: string | null;
   title: string;
   description?: string;
   status: "todo" | "doing" | "waiting" | "done";
@@ -59,7 +63,7 @@ export type Attachment = {
   id: string;
   user_id?: string;
   space_id: string;
-  entity_type: "space" | "note" | "document";
+  entity_type: EntityType;
   entity_id: string | null;
   name: string;
   path: string;
@@ -71,7 +75,7 @@ export type Attachment = {
 
 export type ViewKey = "dashboard" | "notes" | "todos" | "documents" | "settings";
 
-export type SaveState = "idle" | "saving" | "saved" | "error";
+export type SaveState = "idle" | "pending" | "saving" | "saved" | "error";
 
 export type TodoViewMode = "board" | "list";
 

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Attachment, DocumentItem, Note, Space, Todo, WorkspaceData } from "./types";
+import type { Attachment, DocumentItem, EntityType, Note, Space, Todo, WorkspaceData } from "./types";
 
 const STORAGE_KEY = "personal-os-workspace-v2";
 const BUCKET = "workspace-files";
@@ -7,6 +7,16 @@ const BUCKET = "workspace-files";
 type Entity = Space | Note | DocumentItem | Todo | Attachment;
 
 const now = () => new Date().toISOString();
+
+const isEntityType = (value: unknown): value is EntityType => value === "space" || value === "note" || value === "document";
+
+export const toDateOnly = (value?: string | null) => {
+  if (!value) return null;
+  const match = String(value).match(/^(\d{4}-\d{2}-\d{2})/);
+  return match?.[1] ?? null;
+};
+
+const safePathName = (name: string) => name.replace(/[^\w.\-\u4e00-\u9fa5]+/g, "-");
 
 export function createDefaultSpace(userId?: string): Space {
   return {
@@ -55,6 +65,8 @@ export function createBlankDocument(spaceId: string, userId?: string, patch?: Pa
 
 export function createBlankTodo(spaceId: string, userId?: string, patch?: Partial<Todo>): Todo {
   const timestamp = now();
+  const entityType = patch?.entity_type ?? "space";
+  const entityId = patch?.entity_id ?? spaceId;
   return {
     id: crypto.randomUUID(),
     user_id: userId,
@@ -63,11 +75,13 @@ export function createBlankTodo(spaceId: string, userId?: string, patch?: Partia
     description: "",
     status: "todo",
     priority: "medium",
-    due_date: null,
     tags: ["next"],
     created_at: timestamp,
     updated_at: timestamp,
     ...patch,
+    entity_type: entityType,
+    entity_id: entityId,
+    due_date: toDateOnly(patch?.due_date),
   };
 }
 
@@ -96,6 +110,139 @@ function writeLocal(data: WorkspaceData) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
+function normalizeTodoRelation(todo: Todo, data: WorkspaceData): Pick<Todo, "space_id" | "entity_type" | "entity_id" | "due_date"> {
+  const spaceId = data.spaces.some((space) => space.id === todo.space_id) ? todo.space_id : data.spaces[0]?.id;
+  const entityType = isEntityType(todo.entity_type) ? todo.entity_type : "space";
+  const requestedEntityId = todo.entity_id ?? (entityType === "space" ? spaceId : null);
+  const entityExists =
+    entityType === "space"
+      ? data.spaces.some((space) => space.id === requestedEntityId)
+      : entityType === "note"
+        ? data.notes.some((note) => note.id === requestedEntityId && note.space_id === spaceId)
+        : data.documents.some((document) => document.id === requestedEntityId && document.space_id === spaceId);
+
+  if (!spaceId) {
+    return { space_id: todo.space_id, entity_type: "space", entity_id: todo.space_id, due_date: toDateOnly(todo.due_date) };
+  }
+
+  return {
+    space_id: spaceId,
+    entity_type: entityExists ? entityType : "space",
+    entity_id: entityExists ? requestedEntityId : spaceId,
+    due_date: toDateOnly(todo.due_date),
+  };
+}
+
+export function normalizeWorkspaceData(input: Partial<WorkspaceData>, userId?: string): WorkspaceData {
+  const data: WorkspaceData = {
+    spaces: Array.isArray(input.spaces) ? input.spaces : [],
+    notes: Array.isArray(input.notes) ? input.notes : [],
+    documents: Array.isArray(input.documents) ? input.documents : [],
+    todos: Array.isArray(input.todos) ? input.todos : [],
+    attachments: Array.isArray(input.attachments) ? input.attachments : [],
+  };
+
+  const normalizedSpaces = data.spaces.map((space) => ({ ...space, user_id: userId ?? space.user_id }));
+  const fallbackSpace = normalizedSpaces[0];
+  const normalizedData = { ...data, spaces: normalizedSpaces };
+
+  const notes = data.notes
+    .filter((note) => normalizedSpaces.some((space) => space.id === note.space_id))
+    .map((note) => ({ ...note, user_id: userId ?? note.user_id, tags: Array.isArray(note.tags) ? note.tags : [] }));
+  const documents = data.documents
+    .filter((document) => normalizedSpaces.some((space) => space.id === document.space_id))
+    .map((document) => ({ ...document, user_id: userId ?? document.user_id, tags: Array.isArray(document.tags) ? document.tags : [] }));
+  const todos = data.todos
+    .filter((todo) => normalizedSpaces.some((space) => space.id === todo.space_id) || fallbackSpace)
+    .map((todo) => {
+      const withFallbackSpace = { ...todo, space_id: normalizedSpaces.some((space) => space.id === todo.space_id) ? todo.space_id : fallbackSpace?.id ?? todo.space_id };
+      return {
+        ...withFallbackSpace,
+        ...normalizeTodoRelation(withFallbackSpace, { ...normalizedData, notes, documents }),
+        user_id: userId ?? todo.user_id,
+        tags: Array.isArray(todo.tags) ? todo.tags : [],
+      };
+    });
+  const attachments = data.attachments
+    .filter((attachment) => normalizedSpaces.some((space) => space.id === attachment.space_id) || fallbackSpace)
+    .map((attachment) => {
+      const spaceId = normalizedSpaces.some((space) => space.id === attachment.space_id) ? attachment.space_id : fallbackSpace?.id ?? attachment.space_id;
+      const entityType = isEntityType(attachment.entity_type) ? attachment.entity_type : "space";
+      return {
+        ...attachment,
+        user_id: userId ?? attachment.user_id,
+        space_id: spaceId,
+        entity_type: entityType,
+        entity_id: attachment.entity_id ?? (entityType === "space" ? spaceId : null),
+      };
+    });
+
+  return sortData({ spaces: normalizedSpaces, notes, documents, todos, attachments });
+}
+
+export function remapWorkspaceForUser(input: Partial<WorkspaceData>, userId: string): WorkspaceData {
+  const source = normalizeWorkspaceData(input);
+  const timestamp = Date.now();
+  const spaceIds = new Map(source.spaces.map((space) => [space.id, crypto.randomUUID()]));
+  const noteIds = new Map(source.notes.map((note) => [note.id, crypto.randomUUID()]));
+  const documentIds = new Map(source.documents.map((document) => [document.id, crypto.randomUUID()]));
+  const todoIds = new Map(source.todos.map((todo) => [todo.id, crypto.randomUUID()]));
+  const attachmentIds = new Map(source.attachments.map((attachment) => [attachment.id, crypto.randomUUID()]));
+  const mapEntityId = (type: EntityType, id: string | null) => {
+    if (!id) return null;
+    if (type === "space") return spaceIds.get(id) ?? null;
+    if (type === "note") return noteIds.get(id) ?? null;
+    return documentIds.get(id) ?? null;
+  };
+
+  const spaces = source.spaces.map((space) => ({ ...space, id: spaceIds.get(space.id)!, user_id: userId }));
+  const notes = source.notes
+    .filter((note) => spaceIds.has(note.space_id))
+    .map((note) => ({
+      ...note,
+      id: noteIds.get(note.id)!,
+      user_id: userId,
+      space_id: spaceIds.get(note.space_id)!,
+      ai_related_ids: (note.ai_related_ids ?? []).map((id) => noteIds.get(id)).filter(Boolean) as string[],
+    }));
+  const documents = source.documents
+    .filter((document) => spaceIds.has(document.space_id))
+    .map((document) => ({ ...document, id: documentIds.get(document.id)!, user_id: userId, space_id: spaceIds.get(document.space_id)! }));
+  const todos = source.todos
+    .filter((todo) => spaceIds.has(todo.space_id))
+    .map((todo) => {
+      const entityType = isEntityType(todo.entity_type) ? todo.entity_type : "space";
+      const mappedSpaceId = spaceIds.get(todo.space_id)!;
+      return {
+        ...todo,
+        id: todoIds.get(todo.id)!,
+        user_id: userId,
+        space_id: mappedSpaceId,
+        entity_type: entityType,
+        entity_id: mapEntityId(entityType, todo.entity_id) ?? mappedSpaceId,
+        due_date: toDateOnly(todo.due_date),
+      };
+    });
+  const attachments = source.attachments
+    .filter((attachment) => spaceIds.has(attachment.space_id))
+    .map((attachment, index) => {
+      const id = attachmentIds.get(attachment.id)!;
+      const entityType = isEntityType(attachment.entity_type) ? attachment.entity_type : "space";
+      const mappedSpaceId = spaceIds.get(attachment.space_id)!;
+      return {
+        ...attachment,
+        id,
+        user_id: userId,
+        space_id: mappedSpaceId,
+        entity_type: entityType,
+        entity_id: mapEntityId(entityType, attachment.entity_id) ?? (entityType === "space" ? mappedSpaceId : null),
+        path: `${userId}/imports/${timestamp}-${index}-${safePathName(attachment.name)}`,
+      };
+    });
+
+  return normalizeWorkspaceData({ spaces, notes, documents, todos, attachments }, userId);
+}
+
 function migrateLocalWorkspace(data: WorkspaceData): WorkspaceData {
   let changed = false;
   const spaces = data.spaces.map((space) => {
@@ -108,9 +255,10 @@ function migrateLocalWorkspace(data: WorkspaceData): WorkspaceData {
     changed = true;
     return { ...note, title: "未命名想法", content: "", tags: note.tags.includes("draft") ? [] : note.tags };
   });
-  const next = changed ? { ...data, spaces, notes } : data;
-  if (changed) writeLocal(next);
-  return next;
+  const migrated = normalizeWorkspaceData({ ...data, spaces, notes });
+  const changedByShape = JSON.stringify(migrated) !== JSON.stringify(data);
+  if (changed || changedByShape) writeLocal(migrated);
+  return migrated;
 }
 
 function sortData(data: WorkspaceData): WorkspaceData {
@@ -153,13 +301,13 @@ export async function listWorkspaceData(client: SupabaseClient | null, userId?: 
   if (error) throw error;
 
   const spaces = await ensureCloudDefaultSpace(client, userId, (spacesRes.data ?? []) as Space[]);
-  return {
+  return normalizeWorkspaceData({
     spaces,
     notes: (notesRes.data ?? []) as Note[],
     documents: (documentsRes.data ?? []) as DocumentItem[],
     todos: (todosRes.data ?? []) as Todo[],
     attachments: (attachmentsRes.data ?? []) as Attachment[],
-  };
+  }, userId);
 }
 
 export function exportLocalWorkspace() {
@@ -167,7 +315,7 @@ export function exportLocalWorkspace() {
 }
 
 export function importLocalWorkspace(data: WorkspaceData) {
-  writeLocal(sortData({ ...emptyWorkspace(), ...data }));
+  writeLocal(normalizeWorkspaceData({ ...emptyWorkspace(), ...data }));
 }
 
 async function upsertLocal<T extends Entity>(key: keyof WorkspaceData, item: T): Promise<T> {
@@ -175,7 +323,7 @@ async function upsertLocal<T extends Entity>(key: keyof WorkspaceData, item: T):
   const list = data[key] as T[];
   const exists = list.some((entry) => entry.id === item.id);
   const nextList = exists ? list.map((entry) => (entry.id === item.id ? item : entry)) : [item, ...list];
-  writeLocal({ ...data, [key]: nextList });
+  writeLocal(normalizeWorkspaceData({ ...data, [key]: nextList }));
   return item;
 }
 
@@ -200,6 +348,15 @@ async function upsertCloud<T extends Entity>(client: SupabaseClient | null, tabl
   const { data, error } = await client.from(table).upsert(item).select("*").single();
   if (error) throw error;
   return data as T;
+}
+
+async function patchLocalTodo(id: string, patch: Partial<Todo>): Promise<Todo> {
+  const data = readLocal();
+  const current = data.todos.find((todo) => todo.id === id);
+  if (!current) throw new Error("Todo 不存在。");
+  const nextTodo = { ...current, ...patch, due_date: toDateOnly(patch.due_date ?? current.due_date), updated_at: now() };
+  writeLocal(normalizeWorkspaceData({ ...data, todos: data.todos.map((todo) => (todo.id === id ? nextTodo : todo)) }));
+  return nextTodo;
 }
 
 async function deleteCloud(client: SupabaseClient | null, table: string, key: keyof WorkspaceData, id: string) {
@@ -228,7 +385,23 @@ export const repository = {
     return deleteCloud(client, "documents", "documents", id);
   },
   async upsertTodo(client: SupabaseClient | null, todo: Todo) {
-    return upsertCloud(client, "todos", "todos", { ...todo, updated_at: now() });
+    return upsertCloud(client, "todos", "todos", { ...todo, due_date: toDateOnly(todo.due_date), updated_at: now() });
+  },
+  async updateTodoStatus(client: SupabaseClient | null, id: string, status: Todo["status"]) {
+    if (!client) return patchLocalTodo(id, { status });
+    const { data, error } = await client.from("todos").update({ status, updated_at: now() }).eq("id", id).select("*").single();
+    if (error) throw error;
+    return data as Todo;
+  },
+  async patchTodo(client: SupabaseClient | null, id: string, patch: Partial<Todo>) {
+    const normalizedPatch = { ...patch, due_date: patch.due_date === undefined ? undefined : toDateOnly(patch.due_date), updated_at: now() };
+    Object.keys(normalizedPatch).forEach((key) => {
+      if (normalizedPatch[key as keyof typeof normalizedPatch] === undefined) delete normalizedPatch[key as keyof typeof normalizedPatch];
+    });
+    if (!client) return patchLocalTodo(id, normalizedPatch);
+    const { data, error } = await client.from("todos").update(normalizedPatch).eq("id", id).select("*").single();
+    if (error) throw error;
+    return data as Todo;
   },
   async deleteTodo(client: SupabaseClient | null, id: string) {
     return deleteCloud(client, "todos", "todos", id);

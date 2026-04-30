@@ -47,6 +47,8 @@ create table if not exists public.todos (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   space_id uuid not null references public.spaces(id) on delete cascade,
+  entity_type text not null default 'space' check (entity_type in ('space', 'note', 'document')),
+  entity_id uuid,
   title text not null,
   description text not null default '',
   status text not null default 'todo' check (status in ('todo', 'doing', 'waiting', 'done')),
@@ -58,8 +60,25 @@ create table if not exists public.todos (
 );
 
 alter table public.todos add column if not exists description text not null default '';
+alter table public.todos add column if not exists entity_type text not null default 'space';
+alter table public.todos add column if not exists entity_id uuid;
 alter table public.todos drop constraint if exists todos_status_check;
 alter table public.todos add constraint todos_status_check check (status in ('todo', 'doing', 'waiting', 'done'));
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'todos_entity_type_check'
+  ) then
+    alter table public.todos
+      add constraint todos_entity_type_check check (entity_type in ('space', 'note', 'document'));
+  end if;
+end $$;
+
+update public.todos
+set entity_type = 'space',
+    entity_id = space_id
+where entity_id is null;
 
 create table if not exists public.tags (
   id uuid primary key default gen_random_uuid(),
